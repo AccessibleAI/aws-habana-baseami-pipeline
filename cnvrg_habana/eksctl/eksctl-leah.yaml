@@ -1,0 +1,46 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eks-cicd-leah-40
+  region: us-east-1
+  version: "1.20"
+nodeGroups:
+  # - name: ng-1-default
+  #   instanceType: m5a.2xlarge
+  #   minSize: 0
+  #   maxSize: 15
+  #   desiredCapacity: 3
+  #   privateNetworking: true
+  #   iam:
+  #     withAddonPolicies:
+  #       autoScaler: true
+  #       imageBuilder: true
+  #     attachPolicyARNs:
+  #       - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+  #       - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+  #       - arn:aws:iam::aws:policy/AmazonS3FullAccess
+  #   availabilityZones: ['us-east-1a']
+managedNodeGroups:
+  - name: dl1-ng-1d2
+    instanceType: dl1.24xlarge
+    volumeSize: 200
+    instancePrefix: dl1-ng-1d-worker
+    ami: ami-02aeb7b9bc3ad7f37
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        ebs: true
+        fsx: true
+        cloudWatch: true
+    ssh:
+      allow: true
+      publicKeyName: cnvrg-east1
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 4
+    overrideBootstrapCommand: |
+      #!/bin/bash
+      /etc/eks/bootstrap.sh eks-cicd-leah-40
+    availabilityZones: ['us-east-1a']
+availabilityZones: ['us-east-1a','us-east-1b']

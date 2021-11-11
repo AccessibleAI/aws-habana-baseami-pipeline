@@ -1,0 +1,56 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eli-test
+  region: us-west-2
+  version: "1.20"
+managedNodeGroups:
+  - name: default-ng
+    instanceType: t3a.large
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::126800174746:policy/sts_all
+    ssh:
+      allow: true
+      publicKeyName: cnvrg_app_west2
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 4
+    availabilityZones: ['us-west-2a']
+  - name: dl1-ng-2
+    instanceType: dl1.24xlarge
+    volumeSize: 200
+    instancePrefix: dl1-ng-1d-worker
+    ami: ami-095898da639cbbbbe
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        ebs: true
+        fsx: true
+        cloudWatch: true
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::126800174746:policy/sts_all
+    ssh:
+      allow: true
+      publicKeyName: cnvrg_app_west2
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 4
+    overrideBootstrapCommand: |
+      #!/bin/bash
+      /etc/eks/bootstrap.sh eli-test
+    availabilityZones: ['us-west-2b']
+
+availabilityZones: ['us-west-2a','us-west-2b']
